@@ -34,7 +34,6 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: DomainCertificateStack
-          template: ../certificate.yml
+          template: certificate.yml
           parameter-overrides: >-
             HostedZoneId=${{secrets.HOSTED_ZONE_ID}}
-  
