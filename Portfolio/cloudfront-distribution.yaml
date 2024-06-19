@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Provisioning infrastructure for hosting the protfolio web application.
+
+Parameters:
+  PortfolioS3BucketStackName:
+    Type: String
+    Description: Stack name for the S3 stack.
+  PortfolioDistributionName:
+    Type: String
+    Description: Name of the distribution for portfolio website.
+  DomainCertificateStackName:
+    Type: String
+    Description: Stack name for the domain certificate.
+  HostedZoneId:
+    Type: String
+    Description: Hosted zone id for Route 53.
+  CloudFrontHostedZoneId:
+    Type: String
+    Description: Hosted Zone Id for CloudFront
+Resources:
+
+  PortfolioOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig: 
+        Name: Portfolio-OAC
+        Description: OAC to serve the portfolio website from S3.
+        OriginAccessControlOriginType: s3
+        SigningBehavior: no-override
+        SigningProtocol: sigv4
+
+  PortflioDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+        - DomainName: 
+            Fn::ImportValue: !Sub ${PortfolioS3BucketStackName}-PortfolioBucketDomainName
+          Id: !Ref PortfolioDistributionName
+          S3OriginConfig:
+            OriginAccessIdentity: ''
+          OriginAccessControlId: !GetAtt PortfolioOAC.Id
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          TargetOriginId: !Ref PortfolioDistributionName
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: all
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_100
+        Aliases:
+          - 'www.dvinay.in'
+        ViewerCertificate:
+          AcmCertificateArn:
+            Fn::ImportValue: !Sub ${DomainCertificateStackName}-CertificateArn
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+
+
+  # S3 bucket policy to allow access from CloudFront OAC
+  PortfolioBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: 
+        Fn::ImportValue: !Sub ${PortfolioS3BucketStackName}-PortfolioBucketName
+      PolicyDocument:
+        Statement:
+        - Action: s3:GetObject
+          Effect: Allow
+          Resource: 
+            Fn::Join:
+              - ""
+              -
+                - Fn::ImportValue: !Sub ${PortfolioS3BucketStackName}-PortfolioBucketArn
+                - '/*'
+          Principal:
+            Service: cloudfront.amazonaws.com
+          Condition:
+            StringEquals:
+              AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${PortflioDistribution}
+  
+  Route53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "www.dvinay.in"
+      Type: A
+      AliasTarget:
+        HostedZoneId: !Ref CloudFrontHostedZoneId
+        DNSName: !GetAtt PortflioDistribution.DomainName

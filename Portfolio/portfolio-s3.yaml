@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Provisioning infrastructure for hosting the protfolio web application.
+
+Parameters:
+  PortfolioCodeBucketName:
+    Type: String
+    Description: Bucket to store the code for the portfolio website.
+
+Resources:
+  PortfolioBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub ${AWS::AccountId}-${PortfolioCodeBucketName}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  PortfolioBucketName:
+    Value: !Ref PortfolioBucket
+    Description: Name of the bucket that holds purtfolio code.
+    Export:
+      Name: !Sub ${AWS::StackName}-PortfolioBucketName
+  PortfolioBucketArn:
+    Value: !GetAtt PortfolioBucket.Arn
+    Description: ARN of the bucket that holds purtfolio code.
+    Export:
+      Name: !Sub ${AWS::StackName}-PortfolioBucketArn
+  PortfolioBucketDomainName:
+    Value: !GetAtt PortfolioBucket.DomainName
+    Description: Domain name of the bucket that holds purtfolio code.
+    Export:
+      Name: !Sub ${AWS::StackName}-PortfolioBucketDomainName

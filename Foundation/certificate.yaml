@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Generate SSL certificate for the domain.
+
+Parameters:
+  HostedZoneId:
+    Type: String
+    Description: Id of the Hosted Zone.
+
+Resources:
+  DomainCertificate: 
+    Type: AWS::CertificateManager::Certificate
+    Properties: 
+      DomainName: '*.dvinay.in'
+      DomainValidationOptions:
+        - DomainName: dvinay.in
+          HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS
+      SubjectAlternativeNames:
+        - dvinay.in
+
+Outputs:
+  CertificateArn:
+    Value: !Ref DomainCertificate
+    Description: ARN of the domain certificate.
+    Export:
+      Name: !Sub ${AWS::StackName}-CertificateArn
