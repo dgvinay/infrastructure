@@ -15,8 +15,6 @@ Resources:
         - DomainName: dvinay.in
           HostedZoneId: !Ref HostedZoneId
       ValidationMethod: DNS
-      SubjectAlternativeNames:
-        - dvinay.in
 
 Outputs:
   CertificateArn:
