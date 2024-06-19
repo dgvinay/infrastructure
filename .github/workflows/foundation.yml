@@ -1,0 +1,35 @@
+name: Foundation Infrastructure Deployment
+
+on: workflow_dispatch
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read 
+
+jobs:
+  ConfigureAWSCredentials:
+    runs-on: ubuntu-latest
+    environment: AWS Production
+    name: Deployment of foundation infrastructure
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.ASSUME_ROLE_ARN }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ vars.AWS_REGION }}
+
+  FoundationDeployment:
+    runs-on: ubuntu-latest
+    environment: AWS Production
+    name: Create foundation resources
+    needs: ConfigureAWSCredentials
+    steps:
+      - name: DomainCertificate - Deploy
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: DomainCertificateStack
+          template: certificate.yml
+          parameter-overrides: >-
+            HostedZoneId=${{secrets.HOSTED_ZONE_ID}}
+  
