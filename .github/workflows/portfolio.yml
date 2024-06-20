@@ -27,7 +27,7 @@ jobs:
       - name: S3Bucket - Deploy
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: Portfolio-S3
+          name: ${{vars.PORTFOLIO_S3_STACK_NAME}}
           template: Portfolio/portfolio-s3.yaml
           parameter-overrides: >-
             PortfolioCodeBucketName=${{vars.PORTFOLIO_CODE_BUCKET}}
@@ -39,7 +39,7 @@ jobs:
           name: Portfolio-Cloudfront-Distribution
           template: Portfolio/cloudfront-distribution.yaml
           parameter-overrides: >-
-            PortfolioS3BucketStackName=${{vars.PORTFOLIO_CODE_BUCKET}},
+            PortfolioS3BucketStackName=${{vars.PORTFOLIO_S3_STACK_NAME}},
             PortfolioDistributionName=${{vars.PORTFOLIO_DISTRIBUTION_NAME}},
             DomainCertificateStackName=${{vars.DOMAIN_CERTIFICATE_STACK_NAME}},
             HostedZoneId=${{secrets.HOSTED_ZONE_ID}},
