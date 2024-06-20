@@ -16,6 +16,8 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      WebsiteConfiguration:
+        IndexDocument: "index.html"
 
 Outputs:
   PortfolioBucketName:

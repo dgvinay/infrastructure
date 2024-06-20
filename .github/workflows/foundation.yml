@@ -27,7 +27,7 @@ jobs:
       - name: DomainCertificate - Deploy
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: DomainCertificate
+          name: ${{vars.DOMAIN_CERTIFICATE_STACK_NAME}}
           template: Foundation/certificate.yaml
           parameter-overrides: >-
             HostedZoneId=${{secrets.HOSTED_ZONE_ID}}
