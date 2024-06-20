@@ -1,0 +1,47 @@
+name: Portfolio Infrastructure Deployment
+
+on: workflow_dispatch
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read 
+
+jobs:
+  PortfolioDeployment:
+    runs-on: ubuntu-latest
+    environment: AWS Production
+    name: Create portfolio resources
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.ASSUME_ROLE_ARN }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: S3Bucket - Deploy
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: ${{vars.PORTFOLIO_S3_STACK_NAME}}
+          template: Portfolio/portfolio-s3.yaml
+          parameter-overrides: >-
+            PortfolioCodeBucketName=${{vars.PORTFOLIO_CODE_BUCKET}}
+          no-fail-on-empty-changeset: "1"
+          
+      - name: Cloudfront - Deploy
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: Portfolio-Cloudfront-Distribution
+          template: Portfolio/cloudfront-distribution.yaml
+          parameter-overrides: >-
+            PortfolioS3BucketStackName=${{vars.PORTFOLIO_S3_STACK_NAME}},
+            PortfolioDistributionName=${{vars.PORTFOLIO_DISTRIBUTION_NAME}},
+            DomainCertificateStackName=${{vars.DOMAIN_CERTIFICATE_STACK_NAME}},
+            HostedZoneId=${{secrets.HOSTED_ZONE_ID}},
+            CloudFrontHostedZoneId=${{secrets.CLOUDFRONT_HOSTEDZONE_ID}}
+          no-fail-on-empty-changeset: "1"
