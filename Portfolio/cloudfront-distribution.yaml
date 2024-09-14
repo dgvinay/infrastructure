@@ -61,7 +61,15 @@ Resources:
             Fn::ImportValue: !Sub ${DomainCertificateStackName}-CertificateArn
           MinimumProtocolVersion: TLSv1.2_2021
           SslSupportMethod: sni-only
-
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 60
+            ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 60
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
 
   # S3 bucket policy to allow access from CloudFront OAC
   PortfolioBucketPolicy:
