@@ -3,7 +3,7 @@ Description: |
   DynamoDB and related resourcs to be used with portfolio.
 
 Resources:
-  Portfolio-Table:
+  PortfolioTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions: 
