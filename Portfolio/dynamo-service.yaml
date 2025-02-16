@@ -10,16 +10,16 @@ Resources:
         - AttributeName: "portfolioSection"
           AttributeType: "S"
         - AttributeName: "itemOrder"
-          AttributeType: "N"
+          AttributeType: "S"
       BillingMode: "PAY_PER_REQUEST"
       ContributorInsightsSpecification:
         Enabled: false
       DeletionProtectionEnabled: true
       KeySchema: # Required
         - AttributeName: "portfolioSection"
-          KeyType: "Hash"
+          KeyType: "HASH"
         - AttributeName: "itemOrder"
-          KeyType: "Range"
+          KeyType: "RANGE"
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: false
       TableName: "portfolio"
