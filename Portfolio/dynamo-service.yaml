@@ -6,6 +6,11 @@ Resources:
   PortfolioTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      AttributeDefinitions: 
+        - AttributeName: "portfolioSection"
+          AttributeType: "S"
+        - AttributeName: "itemOrder"
+          AttributeType: "N"
       BillingMode: "PAY_PER_REQUEST"
       ContributorInsightsSpecification:
         Enabled: false
