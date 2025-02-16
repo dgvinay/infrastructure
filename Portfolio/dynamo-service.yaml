@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
   DynamoDB and related resourcs to be used with portfolio.
-Parameters:
-  
+
 Resources:
   Portfolio-Table:
     Type: AWS::DynamoDB::Table
@@ -25,5 +24,3 @@ Resources:
       Tags: 
         - Key: "infra-group"
           Value: "portfolio"
-  
-Outputs:
