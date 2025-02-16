@@ -18,6 +18,9 @@ Resources:
         RestrictPublicBuckets: true
       WebsiteConfiguration:
         IndexDocument: "index.html"
+      Tags: 
+        - Key: "infra-group"
+          Value: "portfolio"
 
 Outputs:
   PortfolioBucketName:
